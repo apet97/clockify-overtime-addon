@@ -132,17 +132,97 @@ class OvertimeCalculator {
     }
 
     async fetchAttendanceData(startDate, endDate) {
-        // Try detailed reports first as fallback
-        const url = `https://reports.api.clockify.me/v1/workspaces/${this.workspaceId}/reports/detailed`;
+        // Try time entries API first
+        const url = `https://api.clockify.me/api/v1/workspaces/${this.workspaceId}/time-entries`;
+        
+        // Use GET request with query parameters instead
+        const params = new URLSearchParams({
+            start: `${startDate}T00:00:00.000Z`,
+            end: `${endDate}T23:59:59.999Z`,
+            'page-size': '200'
+        });
+        
+        const fullUrl = `${url}?${params}`;
+        
+        console.log('Making API request to:', fullUrl);
+        console.log('Request headers:', {
+            'X-Api-Key': this.apiKey.substring(0, 8) + '...'
+        });
+
+        const response = await fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+                'X-Api-Key': this.apiKey,
+                'Accept': 'application/json'
+            }
+        });
+
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.log('Error response:', errorText);
+            throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('API response data:', data);
+        return this.convertTimeEntriesToAttendance(data, startDate, endDate);
+    }
+    
+    convertTimeEntriesToAttendance(timeEntries, startDate, endDate) {
+        // Convert time entries format to attendance-like format
+        const userMap = {};
+        
+        timeEntries.forEach(entry => {
+            const userId = entry.userId;
+            const userName = entry.user?.name || 'Unknown User';
+            const date = entry.timeInterval.start.split('T')[0];
+            
+            if (!userMap[userId]) {
+                userMap[userId] = {
+                    userId: userId,
+                    userName: userName,
+                    dailyEntries: {}
+                };
+            }
+            
+            if (!userMap[userId].dailyEntries[date]) {
+                userMap[userId].dailyEntries[date] = 0;
+            }
+            
+            // Calculate duration in hours
+            const start = new Date(entry.timeInterval.start);
+            const end = new Date(entry.timeInterval.end);
+            const hours = (end - start) / (1000 * 60 * 60);
+            
+            userMap[userId].dailyEntries[date] += hours;
+        });
+        
+        // Convert to expected format
+        const attendances = Object.values(userMap).map(user => ({
+            userId: user.userId,
+            userName: user.userName,
+            dailyEntries: Object.entries(user.dailyEntries).map(([date, hours]) => ({
+                date: date,
+                trackedTime: `PT${Math.floor(hours)}H${Math.floor((hours % 1) * 60)}M`
+            }))
+        }));
+        
+        return { attendances };
+    }
+
+    async fetchAttendanceDataOld(startDate, endDate) {
+        // Original attendance API as fallback
+        const url = `https://reports.api.clockify.me/v1/workspaces/${this.workspaceId}/reports/attendance`;
         
         const requestBody = {
             dateRangeStart: `${startDate}T00:00:00.000Z`,
             dateRangeEnd: `${endDate}T23:59:59.999Z`,
-            detailedFilter: {
+            attendanceFilter: {
                 page: 1,
                 pageSize: 200
-            },
-            exportType: "JSON"
+            }
         };
 
         console.log('Making API request to:', url);
@@ -156,7 +236,8 @@ class OvertimeCalculator {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Api-Key': this.apiKey
+                'X-Api-Key': this.apiKey,
+                'Accept': 'application/json'
             },
             body: JSON.stringify(requestBody)
         });
