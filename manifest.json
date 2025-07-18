@@ -8,12 +8,10 @@
   "minimalSubscriptionPlan": "FREE",
   "components": [
     {
-      "name": "overtime-summary",
       "label": "Overtime Summary",
       "type": "reports.tab",
       "path": "/",
-      "accessLevel": "EVERYONE",
-      "settings": []
+      "accessLevel": "EVERYONE"
     }
   ],
   "permissions": [
