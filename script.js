@@ -75,14 +75,17 @@ class OvertimeCalculator {
     }
 
     async generateReport() {
+        // Try to get values from manual input fields first
+        const manualWorkspaceId = document.getElementById('workspaceId').value;
+        const manualApiKey = document.getElementById('apiKey').value;
+        
+        if (manualWorkspaceId && manualApiKey) {
+            this.workspaceId = manualWorkspaceId;
+            this.apiKey = manualApiKey;
+        }
+        
         if (!this.workspaceId || !this.apiKey) {
-            // Show debug info for troubleshooting
-            this.showError(`Debug Info - WorkspaceId: ${this.workspaceId || 'missing'}, API Key: ${this.apiKey ? 'present' : 'missing'}. Check browser console for details.`);
-            
-            // Try to get info one more time
-            if (window.parent && window.parent !== window) {
-                window.parent.postMessage({ type: 'getWorkspaceInfo' }, '*');
-            }
+            this.showError('Please enter your Workspace ID and API Key in the form above, or ensure the add-on is properly installed in Clockify.');
             return;
         }
 

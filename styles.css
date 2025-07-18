@@ -45,6 +45,30 @@ header p {
     margin-bottom: 20px;
 }
 
+.auth-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.auth-section h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.auth-section label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.auth-section input {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
 .date-range {
     display: grid;
     grid-template-columns: auto 1fr auto 1fr;
