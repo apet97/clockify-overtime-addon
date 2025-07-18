@@ -2,8 +2,6 @@
   "key": "overtime-summary",
   "name": "Overtime Summary",
   "description": "Generate overtime summaries per user using attendance data",
-  "version": "1.0.0",
-  "author": "apet97",
   "baseUrl": "https://apet97.github.io/clockify-overtime-addon",
   "minimalSubscriptionPlan": "FREE",
   "components": [
@@ -14,7 +12,7 @@
       "accessLevel": "EVERYONE"
     }
   ],
-  "permissions": [
+  "scopes": [
     "WORKSPACE_READ",
     "REPORTS_READ",
     "USERS_READ"
