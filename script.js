@@ -15,6 +15,10 @@ class OvertimeCalculator {
     }
 
     bindEvents() {
+        document.getElementById('testAPI').addEventListener('click', () => {
+            this.testAPIKey();
+        });
+        
         document.getElementById('generateReport').addEventListener('click', () => {
             this.generateReport();
         });
@@ -128,6 +132,51 @@ class OvertimeCalculator {
             console.error('Error generating report:', error);
             this.showError(`Failed to generate report: ${error.message}`);
             this.showLoading(false);
+        }
+    }
+
+    async testAPIKey() {
+        const manualWorkspaceId = document.getElementById('workspaceId').value.trim();
+        const manualApiKey = document.getElementById('apiKey').value.trim();
+        
+        if (!manualWorkspaceId || !manualApiKey) {
+            this.showError('Please enter both Workspace ID and API Key first');
+            return;
+        }
+        
+        const environment = document.getElementById('environment').value;
+        const baseUrl = environment === 'developer' 
+            ? 'https://developer.clockify.me/api/v1' 
+            : 'https://api.clockify.me/api/v1';
+            
+        // Test with simple user endpoint
+        const testUrl = `${baseUrl}/user`;
+        
+        try {
+            console.log('Testing API key with:', testUrl);
+            
+            const response = await fetch(testUrl, {
+                method: 'GET',
+                headers: {
+                    'X-Api-Key': manualApiKey,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log('Test response status:', response.status);
+            
+            if (response.ok) {
+                const userData = await response.json();
+                this.showError(`✅ API Key Valid! User: ${userData.name} (${userData.email})`, false);
+                console.log('User data:', userData);
+            } else {
+                const errorData = await response.text();
+                this.showError(`❌ API Key Invalid (${response.status}): ${errorData}`);
+                console.log('Error response:', errorData);
+            }
+        } catch (error) {
+            this.showError(`❌ API Test Error: ${error.message}`);
+            console.error('API test error:', error);
         }
     }
 
