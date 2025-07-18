@@ -1,4 +1,5 @@
 {
+  "schemaVersion": "1.0",
   "key": "overtime-summary",
   "name": "Overtime Summary",
   "description": "Generate overtime summaries per user using attendance data",
@@ -6,7 +7,7 @@
   "minimalSubscriptionPlan": "FREE",
   "components": [
     {
-      "label": "Overtime Summary",
+      "label": "Overtime Summary", 
       "type": "reports.tab",
       "path": "/",
       "accessLevel": "EVERYONE"
@@ -14,7 +15,7 @@
   ],
   "scopes": [
     "WORKSPACE_READ",
-    "REPORTS_READ",
+    "REPORTS_READ", 
     "USERS_READ"
   ]
 }
