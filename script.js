@@ -221,7 +221,7 @@ class OvertimeCalculator {
         
         const url = `${baseUrl}/workspaces/${this.workspaceId}/user/${userId}/time-entries?${params}`;
         
-        console.log('Making API request to:', url);
+        console.log('Making API request to (with userId):', url);
         console.log('Request headers:', {
             'X-Api-Key': this.apiKey.substring(0, 8) + '...'
         });
