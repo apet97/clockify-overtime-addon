@@ -134,6 +134,13 @@ class OvertimeCalculator {
             }
         };
 
+        console.log('Making API request to:', url);
+        console.log('Request headers:', {
+            'Content-Type': 'application/json',
+            'X-Api-Key': this.apiKey.substring(0, 8) + '...'
+        });
+        console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -142,6 +149,9 @@ class OvertimeCalculator {
             },
             body: JSON.stringify(requestBody)
         });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
 
         if (!response.ok) {
             throw new Error(`API request failed: ${response.status} ${response.statusText}`);
