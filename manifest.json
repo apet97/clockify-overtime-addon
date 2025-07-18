@@ -15,7 +15,6 @@
   ],
   "scopes": [
     "WORKSPACE_READ",
-    "REPORTS_READ", 
-    "USERS_READ"
+    "REPORTS_READ"
   ]
 }
