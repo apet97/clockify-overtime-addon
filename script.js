@@ -196,33 +196,42 @@ class OvertimeCalculator {
     async fetchAttendanceData(startDate, endDate) {
         // Use the working base URL from API test, or default
         const baseUrl = this.workingBaseUrl || 'https://api.clockify.me/api/v1';
-            
-        // Use POST request for time-entries
-        const url = `${baseUrl}/workspaces/${this.workspaceId}/time-entries`;
         
-        const requestBody = {
-            dateRangeStart: `${startDate}T00:00:00.000Z`,
-            dateRangeEnd: `${endDate}T23:59:59.999Z`,
-            detailedFilter: {
-                page: 1,
-                pageSize: 200
+        // Get current user ID first
+        const userResponse = await fetch(`${baseUrl}/user`, {
+            headers: {
+                'X-Api-Key': this.apiKey,
+                'Accept': 'application/json'
             }
-        };
+        });
+        
+        if (!userResponse.ok) {
+            throw new Error('Failed to get user info');
+        }
+        
+        const userData = await userResponse.json();
+        const userId = userData.id;
+        
+        // Use correct GET endpoint for user time entries
+        const params = new URLSearchParams({
+            start: `${startDate}T00:00:00.000Z`,
+            end: `${endDate}T23:59:59.999Z`,
+            'page-size': '200'
+        });
+        
+        const url = `${baseUrl}/workspaces/${this.workspaceId}/user/${userId}/time-entries?${params}`;
         
         console.log('Making API request to:', url);
         console.log('Request headers:', {
             'X-Api-Key': this.apiKey.substring(0, 8) + '...'
         });
-        console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
         const response = await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
                 'X-Api-Key': this.apiKey,
                 'Accept': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
+            }
         });
 
         console.log('Response status:', response.status);
