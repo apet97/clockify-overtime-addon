@@ -76,16 +76,21 @@ class OvertimeCalculator {
 
     async generateReport() {
         // Try to get values from manual input fields first
-        const manualWorkspaceId = document.getElementById('workspaceId').value;
-        const manualApiKey = document.getElementById('apiKey').value;
+        const manualWorkspaceId = document.getElementById('workspaceId').value.trim();
+        const manualApiKey = document.getElementById('apiKey').value.trim();
+        
+        console.log('Manual inputs:', { workspaceId: manualWorkspaceId, apiKey: manualApiKey ? 'present' : 'missing' });
         
         if (manualWorkspaceId && manualApiKey) {
             this.workspaceId = manualWorkspaceId;
             this.apiKey = manualApiKey;
+            console.log('Set credentials from manual input');
         }
         
+        console.log('Final credentials:', { workspaceId: this.workspaceId, apiKey: this.apiKey ? 'present' : 'missing' });
+        
         if (!this.workspaceId || !this.apiKey) {
-            this.showError('Please enter your Workspace ID and API Key in the form above, or ensure the add-on is properly installed in Clockify.');
+            this.showError(`Missing credentials: WorkspaceID=${this.workspaceId || 'empty'}, APIKey=${this.apiKey ? 'present' : 'empty'}. Please fill both fields above.`);
             return;
         }
 
