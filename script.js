@@ -244,17 +244,27 @@ class OvertimeCalculator {
 
         const data = await response.json();
         console.log('API response data:', data);
+        console.log('Number of time entries:', data.length);
+        
+        if (!data || data.length === 0) {
+            throw new Error('No time entries found for the selected date range');
+        }
+        
         return this.convertTimeEntriesToAttendance(data, startDate, endDate);
     }
     
     convertTimeEntriesToAttendance(timeEntries, startDate, endDate) {
         // Convert time entries format to attendance-like format
+        console.log('Converting time entries to attendance format...');
+        console.log('Sample entry:', timeEntries[0]);
+        
         const userMap = {};
         
-        timeEntries.forEach(entry => {
+        timeEntries.forEach((entry, index) => {
+            console.log(`Processing entry ${index}:`, entry);
             const userId = entry.userId;
-            const userName = entry.user?.name || 'Unknown User';
-            const date = entry.timeInterval.start.split('T')[0];
+            const userName = entry.user?.name || entry.userName || 'Unknown User';
+            const date = entry.timeInterval?.start?.split('T')[0] || entry.start?.split('T')[0];
             
             if (!userMap[userId]) {
                 userMap[userId] = {
