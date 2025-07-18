@@ -1,5 +1,6 @@
 class OvertimeCalculator {
     constructor() {
+        console.log('OvertimeCalculator constructor called');
         this.workspaceId = null;
         this.apiKey = null;
         this.attendanceData = null;
@@ -373,5 +374,15 @@ class OvertimeCalculator {
 
 // Initialize the overtime calculator when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing OvertimeCalculator');
     new OvertimeCalculator();
 });
+
+// Also try window.onload as backup
+window.onload = () => {
+    console.log('Window loaded');
+    if (!window.overtimeCalculator) {
+        console.log('Creating backup OvertimeCalculator instance');
+        window.overtimeCalculator = new OvertimeCalculator();
+    }
+};
