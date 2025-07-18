@@ -29,20 +29,44 @@ class OvertimeCalculator {
 
     async getWorkspaceInfo() {
         try {
-            // Listen for workspace information from Clockify
+            // Listen for messages from Clockify parent frame
             window.addEventListener('message', (event) => {
-                if (event.data && event.data.workspaceId) {
+                console.log('Received message:', event.data);
+                
+                if (event.data && event.data.type === 'workspaceInfo') {
                     this.workspaceId = event.data.workspaceId;
+                    this.apiKey = event.data.token;
+                    console.log('Workspace info received:', this.workspaceId);
                 }
+                
+                // Handle authentication token
                 if (event.data && event.data.token) {
                     this.apiKey = event.data.token;
                 }
+                
+                // Handle workspace ID
+                if (event.data && event.data.workspaceId) {
+                    this.workspaceId = event.data.workspaceId;
+                }
             });
 
-            // Request workspace info from parent Clockify app
-            window.parent.postMessage({
-                type: 'getWorkspaceInfo'
-            }, '*');
+            // Multiple ways to request workspace info
+            setTimeout(() => {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'getWorkspaceInfo' }, '*');
+                    window.parent.postMessage({ type: 'requestWorkspaceInfo' }, '*');
+                    window.parent.postMessage({ action: 'getWorkspaceInfo' }, '*');
+                }
+            }, 100);
+
+            // Try to get from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('workspaceId')) {
+                this.workspaceId = urlParams.get('workspaceId');
+            }
+            if (urlParams.has('token')) {
+                this.apiKey = urlParams.get('token');
+            }
 
         } catch (error) {
             console.error('Error getting workspace info:', error);
@@ -52,7 +76,13 @@ class OvertimeCalculator {
 
     async generateReport() {
         if (!this.workspaceId || !this.apiKey) {
-            this.showError('Workspace information not available. Please ensure the add-on is properly installed.');
+            // Show debug info for troubleshooting
+            this.showError(`Debug Info - WorkspaceId: ${this.workspaceId || 'missing'}, API Key: ${this.apiKey ? 'present' : 'missing'}. Check browser console for details.`);
+            
+            // Try to get info one more time
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'getWorkspaceInfo' }, '*');
+            }
             return;
         }
 
