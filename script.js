@@ -88,11 +88,14 @@ class OvertimeCalculator {
             this.apiKey = manualApiKey;
             console.log('✓ Credentials set successfully');
             
-            // Check API key format
-            if (manualApiKey.length < 60) {
-                this.showError(`API Key seems too short (${manualApiKey.length} chars). Clockify API keys are usually 80+ characters. Please check you copied the full key from Profile Settings → API.`);
+            // Check API key format - but allow shorter keys for testing
+            if (manualApiKey.length < 40) {
+                this.showError(`API Key seems too short (${manualApiKey.length} chars). Please check you copied the full key from Profile Settings → API.`);
                 return;
             }
+            
+            // Show API key prefix for debugging
+            console.log('API Key prefix:', manualApiKey.substring(0, 10) + '...');
         } else {
             this.showError(`Please fill both fields: Workspace ID (${manualWorkspaceId.length} chars), API Key (${manualApiKey.length} chars)`);
             return;
@@ -129,15 +132,17 @@ class OvertimeCalculator {
     }
 
     async fetchAttendanceData(startDate, endDate) {
-        const url = `https://reports.api.clockify.me/v1/workspaces/${this.workspaceId}/reports/attendance`;
+        // Try detailed reports first as fallback
+        const url = `https://reports.api.clockify.me/v1/workspaces/${this.workspaceId}/reports/detailed`;
         
         const requestBody = {
             dateRangeStart: `${startDate}T00:00:00.000Z`,
             dateRangeEnd: `${endDate}T23:59:59.999Z`,
-            attendanceFilter: {
+            detailedFilter: {
                 page: 1,
-                pageSize: 201
-            }
+                pageSize: 200
+            },
+            exportType: "JSON"
         };
 
         console.log('Making API request to:', url);
@@ -167,17 +172,17 @@ class OvertimeCalculator {
         return data;
     }
 
-    calculateOvertime(attendanceData) {
+    calculateOvertime(reportsData) {
         const dailyLimit = parseFloat(document.getElementById('dailyHours').value);
         const weeklyLimit = parseFloat(document.getElementById('weeklyHours').value);
         
         const userResults = {};
 
-        // Process each user's attendance data
-        if (attendanceData.attendances) {
-            attendanceData.attendances.forEach(attendance => {
-                const userId = attendance.userId;
-                const userName = attendance.userName || 'Unknown User';
+        // Process detailed reports data
+        if (reportsData.timeentries) {
+            reportsData.timeentries.forEach(entry => {
+                const userId = entry.userId;
+                const userName = entry.userName || 'Unknown User';
                 
                 if (!userResults[userId]) {
                     userResults[userId] = {
