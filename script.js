@@ -79,18 +79,15 @@ class OvertimeCalculator {
         const manualWorkspaceId = document.getElementById('workspaceId').value.trim();
         const manualApiKey = document.getElementById('apiKey').value.trim();
         
-        console.log('Manual inputs:', { workspaceId: manualWorkspaceId, apiKey: manualApiKey ? 'present' : 'missing' });
+        console.log('Workspace ID length:', manualWorkspaceId.length);
+        console.log('API Key length:', manualApiKey.length);
         
-        if (manualWorkspaceId && manualApiKey) {
+        if (manualWorkspaceId.length > 0 && manualApiKey.length > 0) {
             this.workspaceId = manualWorkspaceId;
             this.apiKey = manualApiKey;
-            console.log('Set credentials from manual input');
-        }
-        
-        console.log('Final credentials:', { workspaceId: this.workspaceId, apiKey: this.apiKey ? 'present' : 'missing' });
-        
-        if (!this.workspaceId || !this.apiKey) {
-            this.showError(`Missing credentials: WorkspaceID=${this.workspaceId || 'empty'}, APIKey=${this.apiKey ? 'present' : 'empty'}. Please fill both fields above.`);
+            console.log('✓ Credentials set successfully');
+        } else {
+            this.showError(`Please fill both fields: Workspace ID (${manualWorkspaceId.length} chars), API Key (${manualApiKey.length} chars)`);
             return;
         }
 
