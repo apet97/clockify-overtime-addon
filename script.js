@@ -87,6 +87,12 @@ class OvertimeCalculator {
             this.workspaceId = manualWorkspaceId;
             this.apiKey = manualApiKey;
             console.log('✓ Credentials set successfully');
+            
+            // Check API key format
+            if (manualApiKey.length < 60) {
+                this.showError(`API Key seems too short (${manualApiKey.length} chars). Clockify API keys are usually 80+ characters. Please check you copied the full key from Profile Settings → API.`);
+                return;
+            }
         } else {
             this.showError(`Please fill both fields: Workspace ID (${manualWorkspaceId.length} chars), API Key (${manualApiKey.length} chars)`);
             return;
