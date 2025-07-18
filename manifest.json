@@ -14,7 +14,6 @@
     }
   ],
   "scopes": [
-    "WORKSPACE_READ",
     "REPORTS_READ"
   ]
 }
