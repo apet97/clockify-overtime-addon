@@ -132,8 +132,13 @@ class OvertimeCalculator {
     }
 
     async fetchAttendanceData(startDate, endDate) {
-        // Try time entries API first
-        const url = `https://api.clockify.me/api/v1/workspaces/${this.workspaceId}/time-entries`;
+        // Check environment selection
+        const environment = document.getElementById('environment').value;
+        const baseUrl = environment === 'developer' 
+            ? 'https://developer.clockify.me/api/v1' 
+            : 'https://api.clockify.me/api/v1';
+            
+        const url = `${baseUrl}/workspaces/${this.workspaceId}/time-entries`;
         
         // Use GET request with query parameters instead
         const params = new URLSearchParams({
