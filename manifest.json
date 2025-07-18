@@ -1,0 +1,21 @@
+{
+  "name": "Overtime Summary",
+  "description": "Generate overtime summaries per user using attendance data",
+  "version": "1.0.0",
+  "author": "Your Company",
+  "homepage": "https://your-domain.com/overtime-addon",
+  "components": [
+    {
+      "name": "overtime-summary",
+      "label": "Overtime Summary",
+      "type": "reports",
+      "url": "/index.html",
+      "settings": []
+    }
+  ],
+  "permissions": [
+    "WORKSPACE_READ",
+    "REPORTS_READ",
+    "USERS_READ"
+  ]
+}

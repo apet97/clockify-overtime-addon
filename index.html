@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overtime Summary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Overtime Summary Report</h1>
+            <p>Generate overtime summaries per user based on attendance data</p>
+        </header>
+
+        <div class="controls">
+            <div class="date-range">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" value="2024-01-01">
+                
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" value="2024-01-31">
+            </div>
+            
+            <div class="overtime-settings">
+                <label for="dailyHours">Daily Hours Limit:</label>
+                <input type="number" id="dailyHours" value="8" min="1" max="24" step="0.5">
+                
+                <label for="weeklyHours">Weekly Hours Limit:</label>
+                <input type="number" id="weeklyHours" value="40" min="1" max="168" step="0.5">
+            </div>
+            
+            <button id="generateReport" class="btn-primary">Generate Overtime Report</button>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Fetching attendance data...</p>
+        </div>
+
+        <div id="error" class="error hidden">
+            <p id="errorMessage"></p>
+        </div>
+
+        <div id="results" class="results hidden">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <h3 id="totalUsers">0</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="usersWithOvertime">0</h3>
+                    <p>Users with Overtime</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalOvertimeHours">0.0</h3>
+                    <p>Total Overtime Hours</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="overtimeTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Total Hours</th>
+                            <th>Regular Hours</th>
+                            <th>Daily Overtime</th>
+                            <th>Weekly Overtime</th>
+                            <th>Total Overtime</th>
+                            <th>Overtime %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="export-section">
+                <button id="exportCSV" class="btn-secondary">Export to CSV</button>
+                <button id="exportJSON" class="btn-secondary">Export to JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
