@@ -145,47 +145,57 @@ class OvertimeCalculator {
         }
         
         const environment = document.getElementById('environment').value;
-        const baseUrl = environment === 'developer' 
-            ? 'https://developer.clockify.me/api/v1' 
-            : 'https://api.clockify.me/api/v1';
-            
-        // Test with simple user endpoint
-        const testUrl = `${baseUrl}/user`;
         
-        try {
-            console.log('Testing API key with:', testUrl);
+        // Try multiple possible API base URLs for developer environment
+        const possibleUrls = environment === 'developer' ? [
+            'https://developer.clockify.me/api/v1',
+            'https://dev.clockify.me/api/v1', 
+            'https://api.developer.clockify.me/api/v1',
+            'https://api.clockify.me/api/v1' // fallback
+        ] : [
+            'https://api.clockify.me/api/v1'
+        ];
+        
+        // Test each URL until one works
+        for (const baseUrl of possibleUrls) {
+            const testUrl = `${baseUrl}/user`;
             
-            const response = await fetch(testUrl, {
-                method: 'GET',
-                headers: {
-                    'X-Api-Key': manualApiKey,
-                    'Accept': 'application/json'
+            try {
+                console.log('Testing API key with:', testUrl);
+                
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Api-Key': manualApiKey,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Test response status:', response.status);
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    this.showError(`✅ API Key Valid! User: ${userData.name} (${userData.email}) - URL: ${baseUrl}`, false);
+                    console.log('Working URL:', baseUrl);
+                    console.log('User data:', userData);
+                    
+                    // Store the working base URL for later use
+                    this.workingBaseUrl = baseUrl;
+                    return;
+                } else {
+                    console.log(`Failed with ${baseUrl}:`, await response.text());
                 }
-            });
-            
-            console.log('Test response status:', response.status);
-            
-            if (response.ok) {
-                const userData = await response.json();
-                this.showError(`✅ API Key Valid! User: ${userData.name} (${userData.email})`, false);
-                console.log('User data:', userData);
-            } else {
-                const errorData = await response.text();
-                this.showError(`❌ API Key Invalid (${response.status}): ${errorData}`);
-                console.log('Error response:', errorData);
+            } catch (error) {
+                console.log(`Error with ${baseUrl}:`, error.message);
             }
-        } catch (error) {
-            this.showError(`❌ API Test Error: ${error.message}`);
-            console.error('API test error:', error);
         }
+        
+        this.showError(`❌ API Key failed with all tested URLs. Check your API key and environment.`);
     }
 
     async fetchAttendanceData(startDate, endDate) {
-        // Check environment selection
-        const environment = document.getElementById('environment').value;
-        const baseUrl = environment === 'developer' 
-            ? 'https://developer.clockify.me/api/v1' 
-            : 'https://api.clockify.me/api/v1';
+        // Use the working base URL from API test, or default
+        const baseUrl = this.workingBaseUrl || 'https://api.clockify.me/api/v1';
             
         const url = `${baseUrl}/workspaces/${this.workspaceId}/time-entries`;
         
